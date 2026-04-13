@@ -1,0 +1,191 @@
+:root {
+    --bg-color: #000000;
+    --acc-color: #ffffff;
+    --acc-glow: rgba(255, 255, 255, 0.3);
+    --card-bg: #0a0a0a;
+    --card-border: rgba(255, 255, 255, 0.15);
+    --text-primary: #ffffff;
+    --text-muted: #888888;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+
+body { background-color: var(--bg-color); color: var(--text-primary); overflow: hidden; height: 100vh; }
+
+.background-vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%); pointer-events: none; z-index: -1; }
+
+header { padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.2rem; font-weight: 900; }
+.logo span { color: var(--acc-color); }
+.badge { padding: 0.4rem 1.2rem; font-size: 0.7rem; background: var(--card-bg); border: 1px solid var(--acc-color); transition: all 0.3s; }
+.badge.loading { border-color: #ffaa00; color: #ffaa00; }
+.badge.ready { border-color: #00ff88; color: #00ff88; }
+
+#interaction-area { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 200px); gap: 4rem; }
+.hero-section { text-align: center; }
+.hero-section h1 { font-size: 3rem; margin-bottom: 1rem; font-weight: 200; }
+.controls { display: flex; gap: 1rem; justify-content: center; }
+
+button { padding: 1rem 3rem; cursor: pointer; border: 1px solid var(--acc-color); background: transparent; color: var(--text-primary); font-weight: 700; transition: all 0.3s ease; }
+.primary-btn { background: var(--acc-color); color: #000; box-shadow: 0 0 20px var(--acc-glow); }
+.primary-btn:hover:not(:disabled) { background: #ccc; }
+.secondary-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.cards-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.75rem; width: 98%; max-width: 1800px; }
+.gaze-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 1.5rem 0.5rem; text-align: center; position: relative; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.gaze-card.gazed { border-color: var(--acc-color); background: #151515; transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,255,255,0.05); }
+.gaze-card .label { font-size: 0.6rem; color: var(--text-muted); margin-bottom: 1rem; }
+.gaze-card h3 { font-size: 0.9rem; font-weight: 300; }
+
+/* 虹膜比例调试条 */
+#iris-debug { display: flex; align-items: center; gap: 1rem; width: 60%; max-width: 800px; }
+#iris-bar { flex: 1; height: 6px; background: #222; border-radius: 3px; position: relative; }
+#iris-indicator { position: absolute; top: -5px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transform: translateX(-50%); transition: left 0.1s; box-shadow: 0 0 10px #fff; }
+#iris-value { font-size: 0.7rem; color: var(--text-muted); min-width: 50px; }
+
+/* 摄像头 */
+.video-preview-container { position: fixed; bottom: 2rem; left: 2rem; width: 200px; height: 150px; background: #000; border: 1px solid var(--text-muted); overflow: hidden; border-radius: 8px; transform: scaleX(-1); }
+#webcam { width: 100%; height: 100%; object-fit: cover; }
+
+/* 眼神光标 */
+#gaze-cursor { position: fixed; width: 12px; height: 12px; background: #fff; box-shadow: 0 0 15px #fff; border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); display: none; }
+#gaze-cursor.active { display: block; }
+
+/* 校准层 */
+#calibration-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+#calib-step-text { font-size: 3rem; font-weight: 100; margin-bottom: 2rem; }
+#calib-dot { width: 20px; height: 20px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px #fff; margin-bottom: 3rem; }
+.calibration-instruction { text-align: center; }
+#calib-instruction-text { font-size: 1rem; color: var(--text-muted); }
+
+.hidden { display: none !important; }
+
+/* ===================================================
+   脑波状态 HUD
+   =================================================== */
+.brainwave-hud {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bw-sensor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bw-connect-btn {
+    padding: 0.3rem 0.8rem;
+    background: transparent;
+    border: 1px solid var(--acc-color);
+    color: var(--text-primary);
+    font-size: 0.65rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.bw-connect-btn:hover {
+    background: var(--acc-color);
+    color: #000;
+}
+
+.bw-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.bw-value {
+    font-size: 0.65rem;
+    font-weight: 900;
+}
+
+.bw-value.connected { color: #00ff88; }
+.bw-value.disconnected { color: #ff3333; }
+
+.bw-meter {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 180px;
+}
+
+.bw-bar-bg {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.bw-bar-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.2s ease;
+}
+
+.bw-bar-fill.focus { background: linear-gradient(90deg, #00c6ff, #0072ff); box-shadow: 0 0 10px #0072ff; }
+.bw-bar-fill.relax { background: linear-gradient(90deg, #f093fb, #f5576c); box-shadow: 0 0 10px #f5576c; }
+
+.bw-val-text {
+    font-size: 0.7rem;
+    font-family: monospace;
+    min-width: 25px;
+}
+
+/* ===================================================
+   交互状态反馈 (Interaction Feedback)
+   =================================================== */
+
+/* 正在确认中 (焦点聚集) */
+.bw-charging-confirm .gaze-card.gazed {
+    border-color: #00c6ff;
+    box-shadow: 0 0 40px rgba(0, 198, 255, 0.4);
+    animation: charge-confirm 0.5s infinite alternate;
+}
+
+/* 正在取消中 (放松聚集) */
+.bw-charging-cancel .gaze-card.gazed {
+    border-color: #f5576c;
+    box-shadow: 0 0 40px rgba(245, 87, 108, 0.4);
+    animation: charge-cancel 0.5s infinite alternate;
+}
+
+@keyframes charge-confirm {
+    from { transform: translateY(-5px) scale(1.02); }
+    to { transform: translateY(-8px) scale(1.05); }
+}
+
+@keyframes charge-cancel {
+    from { transform: translateY(-5px) scale(1); }
+    to { transform: translateY(-3px) scale(0.98); }
+}
+
+/* 触发成功动画 */
+.confirmed-pulse {
+    animation: success-pulse 0.8s ease-out forwards !important;
+}
+
+@keyframes success-pulse {
+    0% { transform: scale(1.05); background: rgba(0, 255, 136, 0.3); border-color: #00ff88; }
+    100% { transform: scale(1); background: var(--card-bg); border-color: #00ff88; }
+}
+
+/* 状态变更对光标的影响 */
+.bw-charging-confirm #gaze-cursor {
+    background: #00c6ff;
+    box-shadow: 0 0 20px #00c6ff;
+    transform: translate(-50%, -50%) scale(2);
+}
+
+.bw-charging-cancel #gaze-cursor {
+    background: #f5576c;
+    box-shadow: 0 0 20px #f5576c;
+    transform: translate(-50%, -50%) scale(0.5);
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配色家离散眼神控制系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="background-vignette"></div>
+
+        <header>
+            <div class="logo">配色家<span>离散眼动</span></div>
+            
+            <!-- 脑波状态面板 -->
+            <div class="brainwave-hud">
+                <div class="bw-sensor">
+                    <button id="bw-connect-btn" class="bw-connect-btn">连接脑波</button>
+                    <span id="bw-status" class="bw-value disconnected">未连接</span>
+                </div>
+                <div class="bw-meter">
+                    <span class="bw-label">确认</span>
+                    <div class="bw-bar-bg"><div class="bw-bar-fill focus" id="bw-focus-bar"></div></div>
+                    <span id="bw-focus-val" class="bw-val-text">0</span>
+                </div>
+                <div class="bw-meter">
+                    <span class="bw-label">取消</span>
+                    <div class="bw-bar-bg"><div class="bw-bar-fill relax" id="bw-relax-bar"></div></div>
+                    <span id="bw-relax-val" class="bw-val-text">0</span>
+                </div>
+            </div>
+
+            <div id="status-badge" class="badge loading">正在加载模型...</div>
+        </header>
+
+        <main id="interaction-area">
+            <div class="hero-section">
+                <h1>配色家离散眼神控制系统</h1>
+                <div class="controls">
+                    <button id="calibrate-btn" class="primary-btn" disabled>快速校准（3步）</button>
+                    <button id="recalibrate-btn" class="secondary-btn" disabled>重新校准</button>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="gaze-card" data-id="1"><div class="label">MATERIAL 01</div><h3>材质 1</h3></div>
+                <div class="gaze-card" data-id="2"><div class="label">MATERIAL 02</div><h3>材质 2</h3></div>
+                <div class="gaze-card" data-id="3"><div class="label">MATERIAL 03</div><h3>材质 3</h3></div>
+                <div class="gaze-card" data-id="4"><div class="label">MATERIAL 04</div><h3>材质 4</h3></div>
+                <div class="gaze-card" data-id="5"><div class="label">MATERIAL 05</div><h3>材质 5</h3></div>
+                <div class="gaze-card" data-id="6"><div class="label">MATERIAL 06</div><h3>材质 6</h3></div>
+                <div class="gaze-card" data-id="7"><div class="label">MATERIAL 07</div><h3>材质 7</h3></div>
+                <div class="gaze-card" data-id="8"><div class="label">MATERIAL 08</div><h3>材质 8</h3></div>
+            </div>
+        </main>
+
+        <!-- 摄像头预览 -->
+        <div class="video-preview-container">
+            <video id="webcam" autoplay playsinline></video>
+        </div>
+
+        <!-- 眼神光标 -->
+        <div id="gaze-cursor"></div>
+
+        <!-- 校准层 -->
+        <div id="calibration-overlay" class="hidden">
+            <div id="calib-step-text"></div>
+            <div id="calib-dot"></div>
+            <div class="calibration-instruction">
+                <span id="calib-instruction-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="gaze-engine.js"></script>
+    <script src="brainwave-engine.js" defer></script>
+</body>
+</html>
